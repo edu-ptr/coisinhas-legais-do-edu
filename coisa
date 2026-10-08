@@ -1,0 +1,128 @@
+-- -- ROOT
+
+CREATE DATABASE IF NOT EXISTS EnergyDrink;
+use EnergyDrink;
+
+CREATE TABLE IF NOT EXISTS User (
+    id_user INT PRIMARY KEY AUTO_INCREMENT,
+    telefone_user VARCHAR(20) NOT NULL,
+    funcao_user INT NOT NULL DEFAULT 0,
+    email_user VARCHAR(100) NOT NULL,
+    nome_user VARCHAR(20) NOT NULL,
+    UNIQUE (telefone_user, email_user)
+);
+
+CREATE TABLE IF NOT EXISTS Funcoes (
+    id_atendente_f INT DEFAULT 1,
+    id_programador_f INT DEFAULT 2,
+    id_fornecedor_f INT DEFAULT 3,
+);
+
+CREATE TABLE IF NOT EXISTS Compra (
+    status_compra INT DEFAULT 0 NOT NULL,
+    id_compra int PRIMARY KEY AUTO_INCREMENT,
+);
+
+CREATE TABLE IF NOT EXISTS Produtos (
+    descrição_produtos VARCHAR NOT NULL,
+    id_produtos INT PRIMARY KEY AUTO_INCREMENT,
+    id_fornecedor_user INT,
+    UNIQUE (descrição_produtos),
+    FOREIGN KEY (id_fornecedor_user)
+        REFERENCES User(id_user)
+);
+
+CREATE TABLE IF NOT EXISTS imagens (
+    link_imagens VARCHAR(500) NOT NULL,
+    id_produtos INT,
+    UNIQUE (link_imagens),
+    FOREIGN KEY (id_produto)
+        REFERENCES Produtos(id_produtos)
+);
+
+CREATE TABLE IF NOT EXISTS Mod (
+    data_mod DATETIME DEFAULT now NOT NULL,
+    acao_mod INT DEFAULT 0 NOT NULL,
+    id_user_mod INT NOT NULL,
+    id_compra_mod INT NOT NULL,
+    papel_mod INT,
+    FOREIGN KEY (id_user_mod)
+        REFERENCES User(id_user),
+    FOREIGN KEY (id_compra_mod)
+        REFERENCES Compra(id_compra)
+);
+
+CREATE TABLE IF NOT EXISTS Compra_x_Produto (
+    quantidade_produto_CXP INT DEFAULT 1 NOT NULL,
+    id_produto INT,
+    id_user_mod INT NOT NULL,
+    id_compra INT,
+    FOREIGN KEY (id_produto)
+        REFERENCES Produtos(id_produto),
+    FOREIGN KEY (id_compra)
+        REFERENCES Compra(id_compra)
+);
+
+CREATE ROLE IF NOT EXISTS 'professores';
+GRANT USAGE ON escola.* TO 'professores';
+GRANT SELECT (nome_aluno, nota_aluno) ON escola.aluno TO 'professores'; 
+GRANT UPDATE (nota_aluno) ON escola.aluno TO 'professores';
+
+CREATE ROLE IF NOT EXISTS 'secretarios';
+GRANT USAGE ON escola.* TO 'secretarios';
+GRANT SELECT ON escola.aluno TO 'secretarios';
+GRANT SELECT ON escola.funcionario TO 'secretarios';
+GRANT UPDATE ON escola.aluno TO 'secretarios';
+
+CREATE ROLE IF NOT EXISTS 'gestores';
+GRANT USAGE ON escola.* TO 'gestores';
+GRANT SELECT ON escola.aluno TO 'gestores';
+GRANT SELECT ON escola.funcionario TO 'gestores';
+GRANT UPDATE ON escola.funcionario TO 'gestores';
+
+CREATE ROLE IF NOT EXISTS 'alunos';
+GRANT USAGE ON escola.* TO 'alunos';
+GRANT SELECT (nome_func, cargo_func) ON escola.funcionario TO 'alunos';
+
+CREATE USER IF NOT EXISTS 'prof'@'%' IDENTIFIED BY 'profprof';
+GRANT 'professores' TO 'prof'@'%';
+SET DEFAULT ROLE professores TO 'prof'@'%';
+
+CREATE USER IF NOT EXISTS 'sec'@'%' IDENTIFIED BY 'secsec';
+GRANT 'secretarios' TO 'sec'@'%';
+SET DEFAULT ROLE secretarios TO 'sec'@'%';
+
+CREATE USER IF NOT EXISTS 'ger'@'%' IDENTIFIED BY 'gerger';
+GRANT 'gestores' TO 'ger'@'%';
+SET DEFAULT ROLE gestores TO 'ger'@'%';
+
+CREATE USER IF NOT EXISTS 'alu'@'%' IDENTIFIED BY 'alualu';
+GRANT 'alunos' TO 'alu'@'%';
+SET DEFAULT ROLE alunos TO 'alu'@'%';
+
+INSERT INTO funcionario (nome_func, telefone_func) VALUES ('Prof01', '47999999999');
+INSERT INTO funcionario (nome_func, telefone_func) VALUES ('Prof02', '47999999995');
+
+SELECT * FROM funcionario;
+
+INSERT INTO aluno (nome_aluno, telefone_aluno, id_func) VALUES ('Aluno01', '47999999997', 1);
+INSERT INTO aluno (nome_aluno, telefone_aluno, id_func) VALUES ('Aluno02', '47999999998', 2);
+
+SELECT * FROM aluno;
+
+-- -- alu 
+
+-- use escola;
+-- SELECT nome_func FROM funcionario;
+
+-- -- prof
+
+-- use escola;
+-- SELECT nome_aluno FROM aluno;
+
+-- -- sec/ger 
+
+-- use escola;
+-- SELECT nome_func FROM funcionario;
+-- SELECT nome_aluno FROM aluno;
+
